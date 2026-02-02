@@ -1,0 +1,21 @@
+# Hydra Watch AI Engine - Requirements
+# Python 3.8+
+
+# Core ML
+torch>=2.0.0
+torch-geometric>=2.4.0
+torch-scatter
+torch-sparse
+
+# Data Processing
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# API
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# Utilities
+tqdm>=4.65.0
+python-dotenv>=1.0.0

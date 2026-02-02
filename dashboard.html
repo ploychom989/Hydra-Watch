@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Hydra Watch - Fraud Detection Dashboard"
+    />
+    <title>Dashboard | Hydra Watch</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/cyber.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+
+    <!-- Vis.js for Graph Visualization -->
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  </head>
+  <body>
+    <!-- Animated Background -->
+    <div class="cyber-bg"></div>
+
+    <div class="dashboard-wrapper">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">HYDRA WATCH</div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section">
+            <div class="nav-section-title">Main</div>
+            <a href="#" class="nav-item active" data-page="overview">
+              <span class="icon">📊</span>
+              <span>Overview</span>
+            </a>
+            <a href="#" class="nav-item" data-page="transactions">
+              <span class="icon">💰</span>
+              <span>Transactions</span>
+            </a>
+            <a href="#" class="nav-item" data-page="graph">
+              <span class="icon">🔗</span>
+              <span>Network Graph</span>
+            </a>
+            <a href="#" class="nav-item" data-page="alerts">
+              <span class="icon">🚨</span>
+              <span>Alerts</span>
+              <span class="nav-badge" id="alertCount">4</span>
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <div class="nav-section-title">Analysis</div>
+            <a href="#" class="nav-item" data-page="accounts">
+              <span class="icon">👤</span>
+              <span>Accounts</span>
+            </a>
+            <a href="#" class="nav-item" data-page="gnn">
+              <span class="icon">🧠</span>
+              <span>GNN Analysis</span>
+            </a>
+            <a href="#" class="nav-item" data-page="reports">
+              <span class="icon">📋</span>
+              <span>Reports</span>
+            </a>
+          </div>
+
+          <div class="nav-section" id="adminSection" style="display: none">
+            <div class="nav-section-title">Admin</div>
+            <a href="#" class="nav-item" data-page="users">
+              <span class="icon">👥</span>
+              <span>User Management</span>
+            </a>
+            <a href="#" class="nav-item" data-page="settings">
+              <span class="icon">⚙️</span>
+              <span>Settings</span>
+            </a>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-info">
+            <div class="user-avatar" id="userAvatar">RM</div>
+            <div class="user-details">
+              <div class="user-name" id="userName">Risk Manager</div>
+              <div class="user-role" id="userRole">Risk Management</div>
+            </div>
+            <button class="logout-btn" id="logoutBtn" title="Logout">🚪</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="dashboard-header">
+          <div>
+            <h1 class="page-title" id="pageTitle">Dashboard Overview</h1>
+            <p class="page-subtitle" id="pageSubtitle">
+              Real-time fraud detection & network analysis
+            </p>
+          </div>
+          <div class="header-actions">
+            <button class="header-btn" id="refreshBtn">
+              <span>🔄</span>
+              <span>Refresh</span>
+            </button>
+            <button class="header-btn" id="exportBtn">
+              <span>📥</span>
+              <span>Export</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- ==================== PAGE: OVERVIEW ==================== -->
+        <section id="page-overview" class="page-content active">
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">💳</div>
+              <div class="stat-value" id="statTransactions">1,247</div>
+              <div class="stat-label">Transactions Today</div>
+              <div class="stat-change up">
+                <span>↑</span>
+                <span id="statTxChange">12.5%</span>
+              </div>
+            </div>
+
+            <div class="stat-card critical">
+              <div class="stat-icon">🚨</div>
+              <div class="stat-value" id="statAlerts">4</div>
+              <div class="stat-label">Active Alerts</div>
+              <div class="stat-change down">
+                <span>↓</span>
+                <span id="statAlertChange">8.3%</span>
+              </div>
+            </div>
+
+            <div class="stat-card warning">
+              <div class="stat-icon">🚫</div>
+              <div class="stat-value" id="statBlocked">23</div>
+              <div class="stat-label">Blocked Accounts</div>
+              <div class="stat-change up">
+                <span>↑</span>
+                <span id="statBlockedChange">15.2%</span>
+              </div>
+            </div>
+
+            <div class="stat-card success">
+              <div class="stat-icon">📈</div>
+              <div class="stat-value" id="statRisk">34.7</div>
+              <div class="stat-label">Avg Risk Score</div>
+              <div class="stat-change down">
+                <span>↓</span>
+                <span id="statRiskChange">5.1%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overview Grid -->
+          <div class="content-grid">
+            <!-- Recent Transactions -->
+            <div class="panel">
+              <div class="panel-header">
+                <h2 class="panel-title">
+                  <span class="icon">💰</span>
+                  Recent Transactions
+                </h2>
+                <div class="panel-actions">
+                  <button class="panel-btn" onclick="showPage('transactions')">
+                    View All
+                  </button>
+                </div>
+              </div>
+              <div class="panel-body" style="padding: 0; overflow-x: auto">
+                <table class="transaction-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>TX ID</th>
+                      <th>From → To</th>
+                      <th>Amount</th>
+                      <th>Risk</th>
+                    </tr>
+                  </thead>
+                  <tbody id="overviewTransactionBody">
+                    <!-- Populated by JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Active Alerts -->
+            <div class="panel">
+              <div class="panel-header">
+                <h2 class="panel-title">
+                  <span class="icon">🚨</span>
+                  Active Alerts
+                </h2>
+                <div class="panel-actions">
+                  <button class="panel-btn" onclick="showPage('alerts')">
+                    View All
+                  </button>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="alerts-list" id="overviewAlertsList">
+                  <!-- Populated by JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE: TRANSACTIONS ==================== -->
+        <section id="page-transactions" class="page-content">
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">
+                <span class="icon">💰</span>
+                Transaction Monitor
+              </h2>
+              <div class="panel-actions">
+                <button class="panel-btn filter-btn active" data-filter="all">
+                  All
+                </button>
+                <button class="panel-btn filter-btn" data-filter="blocked">
+                  Blocked
+                </button>
+                <button class="panel-btn filter-btn" data-filter="flagged">
+                  Flagged
+                </button>
+                <button class="panel-btn filter-btn" data-filter="pending">
+                  Pending
+                </button>
+                <button class="panel-btn filter-btn" data-filter="cleared">
+                  Cleared
+                </button>
+              </div>
+            </div>
+            <div class="panel-body" style="padding: 0; overflow-x: auto">
+              <table class="transaction-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>TX ID</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Amount</th>
+                    <th>Risk Score</th>
+                    <th>Status</th>
+                    <th>Flags</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionTableBody">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE: NETWORK GRAPH ==================== -->
+        <section id="page-graph" class="page-content">
+          <div class="panel" style="height: calc(100vh - 180px)">
+            <div class="panel-header">
+              <h2 class="panel-title">
+                <span class="icon">🔗</span>
+                Network Analysis - Link Analysis
+              </h2>
+              <div class="panel-actions">
+                <button class="panel-btn" id="highlightSuspicious">
+                  Highlight Mule Network
+                </button>
+                <button class="panel-btn" id="resetGraph">Reset View</button>
+              </div>
+            </div>
+            <div
+              class="panel-body"
+              style="padding: 0; position: relative; height: calc(100% - 60px)"
+            >
+              <div class="graph-container" style="height: 100%">
+                <div id="network-graph"></div>
+
+                <!-- Graph Legend -->
+                <div class="graph-legend">
+                  <div class="legend-item">
+                    <span class="legend-dot mule"></span>
+                    <span>Mule Account (บัญชีม้า)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot suspect"></span>
+                    <span>Suspect (ต้องสงสัย)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-dot normal"></span>
+                    <span>Normal (ปกติ)</span>
+                  </div>
+                </div>
+
+                <!-- Graph Controls -->
+                <div class="graph-controls">
+                  <button class="graph-control-btn" id="zoomIn" title="Zoom In">
+                    ➕
+                  </button>
+                  <button
+                    class="graph-control-btn"
+                    id="zoomOut"
+                    title="Zoom Out"
+                  >
+                    ➖
+                  </button>
+                  <button class="graph-control-btn" id="fitAll" title="Fit All">
+                    🎯
+                  </button>
+                </div>
+
+                <!-- Node Details Panel -->
+                <div class="node-details" id="nodeDetails">
+                  <div class="node-details-header">
+                    <span class="node-details-title">Account Details</span>
+                    <button class="node-details-close" id="closeNodeDetails">
+                      ✕
+                    </button>
+                  </div>
+                  <div class="node-detail-row">
+                    <span class="node-detail-label">Account ID</span>
+                    <span class="node-detail-value" id="nodeId">-</span>
+                  </div>
+                  <div class="node-detail-row">
+                    <span class="node-detail-label">Bank</span>
+                    <span class="node-detail-value" id="nodeBank">-</span>
+                  </div>
+                  <div class="node-detail-row">
+                    <span class="node-detail-label">Risk Score</span>
+                    <span class="node-detail-value" id="nodeRisk">-</span>
+                  </div>
+                  <div class="node-detail-row">
+                    <span class="node-detail-label">Connections</span>
+                    <span class="node-detail-value" id="nodeConnections"
+                      >-</span
+                    >
+                  </div>
+                  <div class="node-detail-row">
+                    <span class="node-detail-label">Total Inflow</span>
+                    <span class="node-detail-value" id="nodeInflow">-</span>
+                  </div>
+                  <div class="node-detail-row">
+                    <span class="node-detail-label">Total Outflow</span>
+                    <span class="node-detail-value" id="nodeOutflow">-</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE: ALERTS ==================== -->
+        <section id="page-alerts" class="page-content">
+          <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr)">
+            <div class="stat-card critical">
+              <div class="stat-icon">🔴</div>
+              <div class="stat-value" id="criticalAlerts">2</div>
+              <div class="stat-label">Critical Alerts</div>
+            </div>
+            <div class="stat-card warning">
+              <div class="stat-icon">🟡</div>
+              <div class="stat-value" id="warningAlerts">2</div>
+              <div class="stat-label">Warning Alerts</div>
+            </div>
+            <div class="stat-card success">
+              <div class="stat-icon">🟢</div>
+              <div class="stat-value" id="resolvedAlerts">15</div>
+              <div class="stat-label">Resolved Today</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">
+                <span class="icon">🚨</span>
+                Alert Management
+              </h2>
+              <div class="panel-actions">
+                <button class="panel-btn active">Active</button>
+                <button class="panel-btn">Investigating</button>
+                <button class="panel-btn">Resolved</button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="alerts-list full-alerts" id="fullAlertsList">
+                <!-- Populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE: ACCOUNTS ==================== -->
+        <section id="page-accounts" class="page-content">
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">
+                <span class="icon">👤</span>
+                Account Database
+              </h2>
+              <div class="panel-actions">
+                <button class="panel-btn active">All</button>
+                <button class="panel-btn">Mule</button>
+                <button class="panel-btn">Suspect</button>
+                <button class="panel-btn">Normal</button>
+              </div>
+            </div>
+            <div class="panel-body" style="padding: 0; overflow-x: auto">
+              <table class="transaction-table">
+                <thead>
+                  <tr>
+                    <th>Account ID</th>
+                    <th>Name</th>
+                    <th>Bank</th>
+                    <th>Type</th>
+                    <th>Risk Score</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="accountsTableBody">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE: GNN ANALYSIS ==================== -->
+        <section id="page-gnn" class="page-content">
+          <div class="gnn-intro panel">
+            <div class="panel-header">
+              <h2 class="panel-title">
+                <span class="icon">🧠</span>
+                Graph Neural Networks (GNNs) - วิธีทำงานของ AI
+              </h2>
+            </div>
+            <div class="panel-body">
+              <p
+                style="
+                  color: var(--text-secondary);
+                  margin-bottom: var(--space-lg);
+                "
+              >
+                GNN คือเทคโนโลยี AI ที่ใช้วิเคราะห์ความสัมพันธ์ระหว่างบัญชี
+                เพื่อตรวจจับเครือข่ายบัญชีม้า
+              </p>
+            </div>
+          </div>
+
+          <!-- GNN Steps -->
+          <div class="gnn-steps">
+            <!-- Step 1 -->
+            <div class="gnn-step panel">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h3 class="step-title">Graph Construction</h3>
+                <p class="step-subtitle">สร้างโครงสร้างกราฟ</p>
+                <div class="step-body">
+                  <div class="step-item">
+                    <span class="step-icon">⚫</span>
+                    <div>
+                      <strong>Nodes (จุด)</strong>
+                      <p>
+                        แทน "Object" ที่เราสนใจ - ใน Hydra Watch คือ
+                        <span class="highlight-cyan">บัญชีธนาคาร</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="step-item">
+                    <span class="step-icon">📊</span>
+                    <div>
+                      <strong>Node Features (X)</strong>
+                      <p>
+                        ข้อมูลในจุดนั้น เช่น ยอดเงินคงเหลือ, อายุบัญชี,
+                        จำนวนธุรกรรม
+                      </p>
+                    </div>
+                  </div>
+                  <div class="step-item">
+                    <span class="step-icon">➡️</span>
+                    <div>
+                      <strong>Edges (เส้น)</strong>
+                      <p>
+                        แทน "ความสัมพันธ์" - ใน Hydra Watch คือ
+                        <span class="highlight-magenta">การโอนเงิน</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="step-item">
+                    <span class="step-icon">🔢</span>
+                    <div>
+                      <strong>Adjacency Matrix (A)</strong>
+                      <p>ตารางที่บอกว่าใครเชื่อมกับใคร</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="gnn-step panel">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h3 class="step-title">Message Passing</h3>
+                <p class="step-subtitle">การส่งข่าวสาร - หัวใจสำคัญ</p>
+                <div class="step-body">
+                  <div class="step-highlight">
+                    <p>
+                      Node ทุกตัวจะเตรียม
+                      <strong>"ข้อมูลของตัวเอง"</strong> ใส่กล่องข้อความ
+                      (Message) แล้วส่งไปให้เพื่อนบ้านที่เชื่อมต่อกัน
+                      (Neighbors)
+                    </p>
+                  </div>
+                  <div class="step-example">
+                    <span class="example-label">ตัวอย่าง:</span>
+                    <p>
+                      บัญชี A ส่งข้อมูลหาบัญชี B ว่า
+                      <em>"ฉันพึ่งรับเงินมานะ"</em>, บัญชี C ก็ส่งหา B เหมือนกัน
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="gnn-step panel">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h3 class="step-title">Aggregation</h3>
+                <p class="step-subtitle">การรวบรวมข้อมูล</p>
+                <div class="step-body">
+                  <p>
+                    เมื่อ Node ปลายทางได้รับข้อความจากเพื่อนหลายคน
+                    มันต้องสรุปข้อมูล:
+                  </p>
+                  <div class="step-functions">
+                    <span class="function-tag">SUM ผลรวม</span>
+                    <span class="function-tag">MEAN ค่าเฉลี่ย</span>
+                    <span class="function-tag">MAX ค่าสูงสุด</span>
+                  </div>
+                  <div class="step-example">
+                    <span class="example-label">ตัวอย่าง:</span>
+                    <p>
+                      บัญชี B ได้รับข้อความจาก A (มิจฉาชีพ) และ C (มิจฉาชีพ) → B
+                      ก็จะเริ่มรู้ตัวแล้วว่า <em>"รอบตัวฉันมีแต่คนโกงนี่นา"</em>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="gnn-step panel">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h3 class="step-title">Update / Neural Network Layer</h3>
+                <p class="step-subtitle">การเรียนรู้</p>
+                <div class="step-body">
+                  <p>อัปเดตสถานะความรู้ของตัวเอง (Hidden State):</p>
+                  <div class="step-process">
+                    <div class="process-step">
+                      <span>1</span>
+                      <p>
+                        เอา "ข้อมูลเดิมของตัวเอง" + "ข้อมูลที่สรุปได้จากเพื่อน"
+                      </p>
+                    </div>
+                    <div class="process-step">
+                      <span>2</span>
+                      <p>
+                        ผ่าน Linear Transformation + Activation Function (ReLU)
+                      </p>
+                    </div>
+                    <div class="process-step">
+                      <span>3</span>
+                      <p>
+                        ได้
+                        <span class="highlight-cyan">Node Embedding</span>
+                        ตัวใหม่ที่ฉลาดขึ้น
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="gnn-step panel">
+              <div class="step-number">5</div>
+              <div class="step-content">
+                <h3 class="step-title">Readout / Output</h3>
+                <p class="step-subtitle">การทำนายผล</p>
+                <div class="step-body">
+                  <p>
+                    เมื่อทำซ้ำ Step 2-4 ครบตามจำนวน Layer (2-3 รอบ)
+                    ข้อมูลจะแน่นปึ้ก:
+                  </p>
+                  <div class="step-highlight result">
+                    <div class="result-item">
+                      <strong>Node Classification:</strong>
+                      <p>
+                        นำ Embedding สุดท้ายไปผ่าน
+                        <span class="highlight-magenta">Softmax</span>
+                      </p>
+                    </div>
+                    <div class="result-output">
+                      <p>ใน Hydra Watch ทำนายออกมาเป็น:</p>
+                      <div class="output-options">
+                        <span class="output-normal">Normal ✅</span>
+                        <span class="output-or">หรือ</span>
+                        <span class="output-fraud">Fraud 🚨</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE: REPORTS ==================== -->
+        <section id="page-reports" class="page-content">
+          <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr)">
+            <div class="stat-card">
+              <div class="stat-icon">📋</div>
+              <div class="stat-value">156</div>
+              <div class="stat-label">Reports This Month</div>
+            </div>
+            <div class="stat-card success">
+              <div class="stat-icon">✅</div>
+              <div class="stat-value">฿12.5M</div>
+              <div class="stat-label">Fraud Prevented</div>
+            </div>
+            <div class="stat-card warning">
+              <div class="stat-icon">⏱️</div>
+              <div class="stat-value">2.3m</div>
+              <div class="stat-label">Avg Detection Time</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📈</div>
+              <div class="stat-value">94.7%</div>
+              <div class="stat-label">Accuracy Rate</div>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2 class="panel-title">
+                  <span class="icon">📊</span>
+                  Detection Performance
+                </h2>
+              </div>
+              <div class="panel-body">
+                <div class="chart-placeholder">
+                  <div
+                    class="chart-bar"
+                    style="--height: 85%; --color: var(--neon-cyan)"
+                  >
+                    <span>Jan</span>
+                  </div>
+                  <div
+                    class="chart-bar"
+                    style="--height: 72%; --color: var(--neon-cyan)"
+                  >
+                    <span>Feb</span>
+                  </div>
+                  <div
+                    class="chart-bar"
+                    style="--height: 90%; --color: var(--neon-cyan)"
+                  >
+                    <span>Mar</span>
+                  </div>
+                  <div
+                    class="chart-bar"
+                    style="--height: 65%; --color: var(--neon-magenta)"
+                  >
+                    <span>Apr</span>
+                  </div>
+                  <div
+                    class="chart-bar"
+                    style="--height: 78%; --color: var(--neon-cyan)"
+                  >
+                    <span>May</span>
+                  </div>
+                  <div
+                    class="chart-bar"
+                    style="--height: 95%; --color: var(--neon-green)"
+                  >
+                    <span>Jun</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2 class="panel-title">
+                  <span class="icon">🏦</span>
+                  By Bank
+                </h2>
+              </div>
+              <div class="panel-body">
+                <div class="bank-stats">
+                  <div class="bank-stat-item">
+                    <span class="bank-name">SCB</span>
+                    <div class="bank-bar"><div style="width: 75%"></div></div>
+                    <span class="bank-value">234 cases</span>
+                  </div>
+                  <div class="bank-stat-item">
+                    <span class="bank-name">Kbank</span>
+                    <div class="bank-bar"><div style="width: 62%"></div></div>
+                    <span class="bank-value">189 cases</span>
+                  </div>
+                  <div class="bank-stat-item">
+                    <span class="bank-name">TTB</span>
+                    <div class="bank-bar"><div style="width: 48%"></div></div>
+                    <span class="bank-value">145 cases</span>
+                  </div>
+                  <div class="bank-stat-item">
+                    <span class="bank-name">BBL</span>
+                    <div class="bank-bar"><div style="width: 35%"></div></div>
+                    <span class="bank-value">98 cases</span>
+                  </div>
+                  <div class="bank-stat-item">
+                    <span class="bank-name">BAY</span>
+                    <div class="bank-bar"><div style="width: 28%"></div></div>
+                    <span class="bank-value">76 cases</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE: USERS (Admin Only) ==================== -->
+        <section id="page-users" class="page-content">
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">
+                <span class="icon">👥</span>
+                User Management
+              </h2>
+              <div class="panel-actions">
+                <button
+                  class="cyber-btn"
+                  style="padding: 8px 16px; font-size: 0.75rem"
+                >
+                  + Add User
+                </button>
+              </div>
+            </div>
+            <div class="panel-body" style="padding: 0; overflow-x: auto">
+              <table class="transaction-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Bank</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>สมชาย รักษาความปลอดภัย</strong></td>
+                    <td>somchai@scb.co.th</td>
+                    <td>
+                      <span class="status-badge pending">Risk Management</span>
+                    </td>
+                    <td>SCB</td>
+                    <td><span class="status-badge cleared">Active</span></td>
+                    <td>5 mins ago</td>
+                    <td><button class="panel-btn">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>สมหญิง ตรวจสอบ</strong></td>
+                    <td>somying@kbank.com</td>
+                    <td>
+                      <span class="status-badge pending">Risk Management</span>
+                    </td>
+                    <td>Kbank</td>
+                    <td><span class="status-badge cleared">Active</span></td>
+                    <td>2 hours ago</td>
+                    <td><button class="panel-btn">Edit</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>วิชัย แอดมิน</strong></td>
+                    <td>wichai@hydra.gov</td>
+                    <td><span class="status-badge blocked">Admin</span></td>
+                    <td>-</td>
+                    <td><span class="status-badge cleared">Active</span></td>
+                    <td>Just now</td>
+                    <td><button class="panel-btn">Edit</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PAGE: SETTINGS (Admin Only) ==================== -->
+        <section id="page-settings" class="page-content">
+          <div class="content-grid">
+            <div class="panel">
+              <div class="panel-header">
+                <h2 class="panel-title">
+                  <span class="icon">⚙️</span>
+                  System Settings
+                </h2>
+              </div>
+              <div class="panel-body">
+                <div class="settings-group">
+                  <h4>Risk Thresholds</h4>
+                  <div class="setting-item">
+                    <label>Auto-Block Threshold</label>
+                    <input
+                      type="number"
+                      value="80"
+                      class="setting-input"
+                      min="0"
+                      max="100"
+                    />
+                    <span class="setting-hint"
+                      >Score above this will auto-block</span
+                    >
+                  </div>
+                  <div class="setting-item">
+                    <label>Alert Threshold</label>
+                    <input
+                      type="number"
+                      value="60"
+                      class="setting-input"
+                      min="0"
+                      max="100"
+                    />
+                    <span class="setting-hint"
+                      >Score above this will trigger alert</span
+                    >
+                  </div>
+                </div>
+
+                <div class="settings-group">
+                  <h4>Notifications</h4>
+                  <div class="setting-item">
+                    <label>Email Alerts</label>
+                    <input type="checkbox" checked class="setting-checkbox" />
+                  </div>
+                  <div class="setting-item">
+                    <label>SMS Alerts</label>
+                    <input type="checkbox" class="setting-checkbox" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2 class="panel-title">
+                  <span class="icon">🔌</span>
+                  API Connections
+                </h2>
+              </div>
+              <div class="panel-body">
+                <div class="api-status">
+                  <div class="api-item">
+                    <span class="api-name">SCB API</span>
+                    <span class="status-badge cleared">Connected</span>
+                  </div>
+                  <div class="api-item">
+                    <span class="api-name">Kbank API</span>
+                    <span class="status-badge cleared">Connected</span>
+                  </div>
+                  <div class="api-item">
+                    <span class="api-name">TTB API</span>
+                    <span class="status-badge cleared">Connected</span>
+                  </div>
+                  <div class="api-item">
+                    <span class="api-name">BBL API</span>
+                    <span class="status-badge flagged">Degraded</span>
+                  </div>
+                  <div class="api-item">
+                    <span class="api-name">BAY API</span>
+                    <span class="status-badge cleared">Connected</span>
+                  </div>
+                  <div class="api-item">
+                    <span class="api-name">Kafka Stream</span>
+                    <span class="status-badge cleared">Active</span>
+                  </div>
+                  <div class="api-item">
+                    <span class="api-name">GNN AI Service</span>
+                    <span class="status-badge cleared">Running</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/mockData.js"></script>
+    <script src="js/graph.js"></script>
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>

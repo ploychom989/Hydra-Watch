@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hydra Watch - Create Your Secure Account">
+  <title>Register | Hydra Watch</title>
+  <link rel="stylesheet" href="css/cyber.css">
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="cyber-bg"></div>
+
+  <!-- Main Container -->
+  <div class="cyber-container">
+    <div class="cyber-card">
+      <!-- Logo -->
+      <div class="cyber-logo">
+        <h1 class="glitch">Hydra Watch</h1>
+        <p>Create Your Account</p>
+      </div>
+
+      <!-- Alert Messages -->
+      <div id="alertBox" class="cyber-alert"></div>
+
+      <!-- Registration Form -->
+      <form id="registerForm" class="cyber-form">
+        <!-- Name & Surname Row -->
+        <div class="input-row">
+          <div class="input-group">
+            <label for="firstName">First Name</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              name="firstName" 
+              placeholder="Your first name"
+              required
+            >
+          </div>
+          <div class="input-group">
+            <label for="lastName">Last Name</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              name="lastName" 
+              placeholder="Your last name"
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="input-group">
+          <label for="phone">Phone Number</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            name="phone" 
+            placeholder="e.g. 0812345678"
+            required
+            pattern="[0-9]{10}"
+          >
+        </div>
+
+        <!-- Role Selection -->
+        <div class="input-group">
+          <label for="role">Select Role</label>
+          <select id="role" name="role" required>
+            <option value="">-- Select your role --</option>
+            <option value="risk_management">Risk Management</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <!-- Risk Management Fields (Hidden by default) -->
+        <div id="riskManagementFields" class="role-fields">
+          <div class="input-group">
+            <label for="employeeId">Employee ID</label>
+            <input 
+              type="text" 
+              id="employeeId" 
+              name="employeeId" 
+              placeholder="Enter your employee ID"
+            >
+          </div>
+          <div class="input-group">
+            <label for="bankName">Bank Name</label>
+            <select id="bankName" name="bankName">
+              <option value="">-- Select your bank --</option>
+              <option value="SCB">SCB (Siam Commercial Bank)</option>
+              <option value="Kbank">Kbank (Kasikorn Bank)</option>
+              <option value="TTB">TTB (TMB Thanachart Bank)</option>
+              <option value="BBL">BBL (Bangkok Bank)</option>
+              <option value="BAY">BAY (Bank of Ayudhya)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Admin Fields (Hidden by default) -->
+        <div id="adminFields" class="role-fields">
+          <div class="input-group">
+            <label for="personalId">Personal ID</label>
+            <input 
+              type="text" 
+              id="personalId" 
+              name="personalId" 
+              placeholder="Enter your personal ID"
+              maxlength="13"
+            >
+          </div>
+          <div class="input-group">
+            <label for="idCard">ID Card Number</label>
+            <input 
+              type="text" 
+              id="idCard" 
+              name="idCard" 
+              placeholder="Enter your ID card number"
+              maxlength="13"
+            >
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+          <label for="password">Create Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="Create a secure password"
+            required
+            minlength="8"
+          >
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="input-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            name="confirmPassword" 
+            placeholder="Confirm your password"
+            required
+            minlength="8"
+          >
+        </div>
+
+        <!-- Divider -->
+        <div class="cyber-divider">
+          <span>Complete Registration</span>
+        </div>
+
+        <!-- Register Button -->
+        <button type="submit" class="cyber-btn primary" id="registerBtn">
+          Create Account
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <div class="cyber-link">
+        Already have an account? <a href="index.html">Login Here</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/auth.js"></script>
+</body>
+</html>

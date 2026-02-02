@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hydra Watch - Secure Cyber Authentication Portal">
+  <title>Login | Hydra Watch</title>
+  <link rel="stylesheet" href="css/cyber.css">
+</head>
+<body>
+  <!-- Animated Background -->
+  <div class="cyber-bg"></div>
+
+  <!-- Main Container -->
+  <div class="cyber-container">
+    <div class="cyber-card">
+      <!-- Logo -->
+      <div class="cyber-logo">
+        <h1 class="glitch">Hydra Watch</h1>
+        <p>Secure Access Portal</p>
+      </div>
+
+      <!-- Alert Messages -->
+      <div id="alertBox" class="cyber-alert"></div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="cyber-form">
+        <!-- Username -->
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            placeholder="Enter your username"
+            required
+            autocomplete="username"
+          >
+        </div>
+
+        <!-- Password -->
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="Enter your password"
+            required
+            autocomplete="current-password"
+          >
+        </div>
+
+        <!-- Phone Number with OTP -->
+        <div class="otp-section">
+          <div class="input-group">
+            <label for="phone">Phone Number</label>
+            <input 
+              type="tel" 
+              id="phone" 
+              name="phone" 
+              placeholder="e.g. 0812345678"
+              required
+              pattern="[0-9]{10}"
+            >
+          </div>
+          <button type="button" id="sendOtpBtn" class="otp-btn">Send OTP</button>
+        </div>
+
+        <!-- OTP Input (Hidden by default) -->
+        <div id="otpInputGroup" class="input-group otp-input-group">
+          <label for="otp">Enter OTP Code</label>
+          <input 
+            type="text" 
+            id="otp" 
+            name="otp" 
+            placeholder="Enter 6-digit code"
+            maxlength="6"
+            pattern="[0-9]{6}"
+          >
+          <div id="otpTimer" class="otp-timer">
+            Resend OTP in <span id="countdown">60</span>s
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="cyber-divider">
+          <span>Verify & Continue</span>
+        </div>
+
+        <!-- Login Button -->
+        <button type="submit" class="cyber-btn primary" id="loginBtn">
+          Access System
+        </button>
+      </form>
+
+      <!-- Register Link -->
+      <div class="cyber-link">
+        Don't have an account? <a href="register.html">Register Now</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/otp.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
